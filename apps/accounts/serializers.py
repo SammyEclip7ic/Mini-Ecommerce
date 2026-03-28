@@ -58,3 +58,11 @@ class LoginSerializer(TokenObtainPairSerializer):
         }
         
         return data
+
+class UserSerializer(serializers.ModelSerializer):
+    """
+    Serializer to return basic user information.
+    """
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'username', 'fullName', 'role')
