@@ -1,0 +1,6 @@
+{
+    "python.defaultInterpreterPath": "d:\\GDG Capstone\\Mini-Ecommerce\\venv\\Scripts\\python.exe",
+    "python.analysis.extraPaths": [
+        "d:\\GDG Capstone\\Mini-Ecommerce\\venv\\Lib\\site-packages"
+    ]
+}
