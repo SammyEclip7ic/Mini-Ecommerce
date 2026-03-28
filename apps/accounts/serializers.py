@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 User = get_user_model()
 
@@ -35,3 +36,25 @@ class RegisterSerializer(serializers.ModelSerializer):
             role=validated_data.get('role', 'customer')
         )
         return user
+
+class LoginSerializer(TokenObtainPairSerializer):
+    """
+    Custom serializer for JWT login.
+    Uses 'email' as the username field for authentication.
+    """
+    username_field = 'email'
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        
+        # Add custom data to the response if needed
+        # For example, user details
+        data['user'] = {
+            'id': self.user.id,
+            'email': self.user.email,
+            'username': self.user.username,
+            'fullName': self.user.fullName,
+            'role': self.user.role,
+        }
+        
+        return data
