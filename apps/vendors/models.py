@@ -7,7 +7,7 @@ class Vendor(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     user = models.OneToOneField(
-        'accounts.User',   # 🔗 connects to your User model
+        'accounts.User',   # connects to the User model
         on_delete=models.CASCADE,
         related_name='vendor'
     )
