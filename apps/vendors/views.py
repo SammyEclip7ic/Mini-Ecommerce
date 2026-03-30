@@ -6,7 +6,6 @@ from rest_framework.exceptions import PermissionDenied
 from .models import Vendor
 from .serializers import VendorSerializer
 
-
 class CreateVendorView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -49,4 +48,3 @@ class UpdateVendorView(APIView):
             return Response(serializer.data)
 
         return Response(serializer.errors)
-
