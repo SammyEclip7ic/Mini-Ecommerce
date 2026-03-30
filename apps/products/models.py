@@ -2,7 +2,7 @@ import uuid
 from django.db import models
 from django.utils.text import slugify
 
-from vendors.models import Vendor
+from apps.vendors.models import Vendor
 
 
 class Category(models.Model):
