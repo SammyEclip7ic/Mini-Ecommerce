@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'apps.accounts',
+    'apps.reviews',
+    'apps.chat',
 ]
 
 MIDDLEWARE = [
