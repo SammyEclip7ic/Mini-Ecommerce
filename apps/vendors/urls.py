@@ -1,8 +1,10 @@
-from django.urls import path
-from .views import CreateVendorView, VendorProfileView, UpdateVendorView
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import ProductViewSet, CategorySerializer
+
+router = DefaultRouter()
+router.register(r'', ProductViewSet)
 
 urlpatterns = [
-    path('', CreateVendorView.as_view()),
-    path('me/', VendorProfileView.as_view()),
-    path('update/', UpdateVendorView.as_view()),
+    path('', include(router.urls)),
 ]
