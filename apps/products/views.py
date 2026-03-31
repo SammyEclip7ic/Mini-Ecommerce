@@ -1,10 +1,11 @@
-from rest_framework import viewsets, generics, status, filters
+from rest_framework import viewsets, generics, status, filters, serializers
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Product, Category
 from .serializers import ProductSerializer, CategorySerializer
 from apps.accounts.permissions import IsVendor # From Person 1
 from apps.vendors.models import Vendor
+from django.db.models import QuerySet
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
@@ -32,6 +33,7 @@ class ProductViewSet(viewsets.ModelViewSet):
             raise serializers.ValidationError("Your vendor account is not yet approved.")
         serializer.save(vendor=vendor_profile)
 
+    
 class VendorDashboardView(generics.ListAPIView):
     """
     Task: Vendor product dashboard
@@ -40,6 +42,6 @@ class VendorDashboardView(generics.ListAPIView):
     serializer_class = ProductSerializer
     permission_classes = [IsVendor]
 
-    def get_queryset(self):
-        vendor_id = self.kwargs['vendor_id']
+    def get_queryset(self) -> QuerySet: # type: ignore
+        vendor_id = self.kwargs.get('vendor_id')
         return Product.objects.filter(vendor__id=vendor_id)
