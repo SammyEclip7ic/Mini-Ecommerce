@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'apps.vendors',
     'apps.reviews',
     'apps.chat',
-    'django_filters', # Required for searching/filtering
+    'django_filters',
 ]
 
 REST_FRAMEWORK = {
