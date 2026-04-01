@@ -45,7 +45,9 @@ INSTALLED_APPS = [
     'apps.vendors',
     'apps.reviews',
     'apps.chat',
-    'django_filters', # Required for searching/filtering
+    'apps.cart',
+    'apps.orders',
+    'django_filters',
 ]
 
 REST_FRAMEWORK = {
@@ -88,12 +90,8 @@ WSGI_APPLICATION = 'MiniEcommerce.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mini_ecommerce',
-        'USER': 'postgres',
-        'PASSWORD': '123123',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
