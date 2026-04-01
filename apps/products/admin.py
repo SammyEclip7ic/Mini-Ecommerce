@@ -15,7 +15,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ('category', 'vendor', 'createdAt')
     search_fields = ('name', 'description')
     
-    # This tells Django the slug is read-only in the admin (since your code auto-generates it)
+    # This tells Django the slug is read-only in the admin
     readonly_fields = ('slug',)
     
     # Adds the image upload rows to the bottom of the product page
