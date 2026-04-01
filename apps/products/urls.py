@@ -1,11 +1,10 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import ProductViewSet, VendorProductDashboard
+from .views import ProductViewSet, CategorySerializer
 
 router = DefaultRouter()
-router.register(r'', ProductViewSet, basename='products')
+router.register(r'', ProductViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('vendor/dashboard/', VendorProductDashboard.as_view()),
 ]
