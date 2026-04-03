@@ -38,19 +38,37 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Third party apps
     'rest_framework',
     'rest_framework_simplejwt',
-    'apps.accounts',
-    'apps.products',
-    'apps.vendors',
-    'apps.reviews',
-    'apps.chat',
     'django_filters',
+
+    # Local apps
+    'apps.core',
+    'apps.accounts',
+    'apps.vendors',
+    'apps.products',
+    'apps.cart',
+    'apps.orders',
+    'apps.payments',
+    'apps.reviews',
+    'apps.wishlist',
+    'apps.notifications',
+    'apps.chat',
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'apps.core.pagination.StandardResultsSetPagination',
+    'PAGE_SIZE': 10,
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ],
 }
 
 MIDDLEWARE = [
@@ -144,3 +162,19 @@ AUTH_USER_MODEL = 'accounts.User'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+# Payment Gateway Settings (Development)
+TELEBIRR_API_URL = 'https://api.telebirr.com'
+TELEBIRR_MERCHANT_ID = 'your_merchant_id'
+TELEBIRR_API_KEY = 'your_api_key'
+
+CHAPA_API_URL = 'https://api.chapa.co/v1'
+CHAPA_SECRET_KEY = 'your_secret_key'
+
+CBE_API_URL = 'https://api.cbe.com.et'
+CBE_MERCHANT_CODE = 'your_merchant_code'
+CBE_API_KEY = 'your_api_key'
+
+# Default auto field
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

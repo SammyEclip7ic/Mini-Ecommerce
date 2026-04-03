@@ -16,19 +16,61 @@ Including another URLconf
 """
 from django.conf import settings
 from django.conf.urls.static import static
-
 from django.contrib import admin
 from django.urls import path, include
+from django.http import JsonResponse
+
+
+def api_root(request):
+    """API root endpoint with available endpoints"""
+    return JsonResponse({
+        'message': 'Welcome to CampusConnect Market API',
+        'version': '1.0',
+        'endpoints': {
+            'accounts': '/api/v1/accounts/',
+            'vendors': '/api/v1/vendors/',
+            'products': '/api/v1/products/',
+            'categories': '/api/v1/products/categories/',
+            'cart': '/api/v1/cart/',
+            'orders': '/api/v1/orders/',
+            'payments': '/api/v1/payments/',
+            'reviews': '/api/v1/reviews/',
+            'wishlist': '/api/v1/wishlist/',
+            'notifications': '/api/v1/notifications/',
+            'admin': '/admin/',
+        },
+        'authentication': {
+            'register': '/api/v1/accounts/auth/register/',
+            'login': '/api/v1/accounts/auth/login/',
+            'refresh': '/api/v1/accounts/auth/token/refresh/',
+            'profile': '/api/v1/accounts/auth/profile/',
+        },
+        'documentation': 'See API_DOCUMENTATION.md for complete API reference'
+    })
+
+
+def health_check(request):
+    """Health check endpoint"""
+    return JsonResponse({'status': 'healthy', 'service': 'CampusConnect Market API'})
+
 
 urlpatterns = [
+    path('', api_root, name='api-root'),
+    path('health/', health_check, name='health-check'),
     path('admin/', admin.site.urls),
-    path('accounts/', include('apps.accounts.urls')),
+    
+    # API v1 endpoints
+    path('api/v1/', api_root, name='api-v1-root'),
+    path('api/v1/accounts/', include('apps.accounts.urls')),
+    path('api/v1/vendors/', include('apps.vendors.urls')),
     path('api/v1/products/', include('apps.products.urls')),
-    path('api/v1vendors/', include('apps.vendors.urls')),
-    path('chat/', include('apps.chat.urls')),
-    path('reviews/', include('apps.reviews.urls')),
-    path('api/carts/', include('apps.cart.urls')),
-    path('api/orders/', include('apps.orders.urls')),
+    path('api/v1/cart/', include('apps.cart.urls')),
+    path('api/v1/orders/', include('apps.orders.urls')),
+    path('api/v1/payments/', include('apps.payments.urls')),
+    path('api/v1/reviews/', include('apps.reviews.urls')),
+    path('api/v1/wishlist/', include('apps.wishlist.urls')),
+    path('api/v1/notifications/', include('apps.notifications.urls')),
+    path('api/v1/chat/', include('apps.chat.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
