@@ -43,3 +43,8 @@ urllib3==2.6.3
 vine==5.1.0
 wcwidth==0.6.0
 whitenoise==6.12.0
+requests==2.33.1
+
+# Additional production dependencies
+python-decouple==3.8
+gunicorn==21.2.0
