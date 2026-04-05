@@ -8,8 +8,8 @@ A professional e-commerce REST API built with Django and Django REST Framework f
 
 ### API Base URL
 ```
-Production: https://your-app-name.onrender.com/api/v1
-Health Check: https://your-app-name.onrender.com/health/
+Production: https://campus-ecommerce-api.onrender.com/api/v1
+Health Check: https://campus-ecommerce-api.onrender.com/health/
 ```
 
 ### Authentication

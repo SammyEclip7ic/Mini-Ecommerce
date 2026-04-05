@@ -1,6 +1,6 @@
 # CampusConnect Mini-Ecommerce API Documentation
 
-**Base URL:** `https://your-app-name.onrender.com`  
+**Base URL:** `https://campus-ecommerce-api.onrender.com`  
 **API Version:** v1  
 **Authentication:** JWT Bearer Token
 
@@ -481,13 +481,13 @@ Authorization: Bearer <access_token>
 
 ## React Integration Example
 
-### Setup Axios Instance
+### Setup API Client
 
 ```javascript
 // src/api/axios.js
 import axios from 'axios';
 
-const API_BASE_URL = 'https://your-app-name.onrender.com/api/v1';
+const API_BASE_URL = 'https://campus-ecommerce-api.onrender.com/api/v1';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
