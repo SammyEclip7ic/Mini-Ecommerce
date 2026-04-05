@@ -24,7 +24,7 @@ from django.http import JsonResponse
 def api_root(request):
     """API root endpoint with available endpoints"""
     return JsonResponse({
-        'message': 'Welcome to CampusConnect Market API',
+        'message': 'Welcome to CampusConnect Mini-Ecommerce API',
         'version': '1.0',
         'endpoints': {
             'accounts': '/api/v1/accounts/',
@@ -51,7 +51,7 @@ def api_root(request):
 
 def health_check(request):
     """Health check endpoint"""
-    return JsonResponse({'status': 'healthy', 'service': 'CampusConnect Market API'})
+    return JsonResponse({'status': 'healthy', 'service': 'CampusConnect Mini-Ecommerce API'})
 
 
 urlpatterns = [
@@ -74,3 +74,8 @@ urlpatterns = [
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Admin site customization
+admin.site.site_header = "CampusConnect Mini-Ecommerce Administration"
+admin.site.site_title = "CampusConnect Admin"
+admin.site.index_title = "Welcome to CampusConnect Mini-Ecommerce Admin"

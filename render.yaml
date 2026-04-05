@@ -1,0 +1,46 @@
+services:
+  # Web Service
+  - type: web
+    name: campus-ecommerce-api
+    env: python
+    region: oregon
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn MiniEcommerce.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: ALLOWED_HOSTS
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: campus-ecommerce-db
+          property: connectionString
+      - key: DJANGO_SETTINGS_MODULE
+        value: MiniEcommerce.settings
+      # Payment Gateway Keys (set these manually in Render dashboard)
+      - key: TELEBIRR_MERCHANT_ID
+        sync: false
+      - key: TELEBIRR_API_KEY
+        sync: false
+      - key: CHAPA_SECRET_KEY
+        sync: false
+      - key: CBE_MERCHANT_CODE
+        sync: false
+      - key: CBE_API_KEY
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+
+  # PostgreSQL Database
+  - type: pserv
+    name: campus-ecommerce-db
+    env: docker
+    region: oregon
+    plan: free
+    ipAllowList: []
+    databaseName: campus_ecommerce_db
+    databaseUser: campus_user

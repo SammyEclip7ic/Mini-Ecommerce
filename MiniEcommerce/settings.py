@@ -13,6 +13,15 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 import os
 from datetime import timedelta
+
+# Try to import dj_database_url, but don't fail if not installed (for local dev)
+try:
+    import dj_database_url
+    HAS_DJ_DATABASE_URL = True
+except ImportError:
+    HAS_DJ_DATABASE_URL = False
+    print("Warning: dj_database_url not installed. Install with: pip install dj-database-url")
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,12 +30,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-3_8i$5^!v^k6dv%2v_o6h^*uicz=n5zcbh1!9vga!l@4x($-n+'
+# Use environment variable in production, fallback to default for development
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-3_8i$5^!v^k6dv%2v_o6h^*uicz=n5zcbh1!9vga!l@4x($-n+')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Set DEBUG=False in production via environment variable
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+# Allow Render.com hosts and localhost for development
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -43,6 +55,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'django_filters',
+    'corsheaders',  # CORS headers for API access
 
     # Local apps
     'apps.core',
@@ -73,6 +86,7 @@ REST_FRAMEWORK = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Serve static files in production
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -101,15 +115,36 @@ TEMPLATES = [
 WSGI_APPLICATION = 'MiniEcommerce.wsgi.application'
 
 
-# Database
+# Database Configuration
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# PostgreSQL for production (Render.com) with SQLite fallback for local development
+# Install required packages: pip install dj-database-url psycopg2-binary
+
+# Check if DATABASE_URL environment variable exists (production on Render)
+if os.environ.get('DATABASE_URL') and HAS_DJ_DATABASE_URL:
+    # Production: Use PostgreSQL via DATABASE_URL from Render
+    # Render automatically provides DATABASE_URL for managed PostgreSQL
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL'),
+            conn_max_age=600,  # Connection pooling: keep connections alive for 600 seconds
+            conn_health_checks=True,  # Enable connection health checks
+            ssl_require=True  # Render PostgreSQL requires SSL
+        )
     }
-}
+else:
+    # Local Development: Use SQLite
+    # (Also used if dj_database_url is not installed)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+# Note: On Render.com, create a PostgreSQL database with name "campus_ecommerce_db"
+# Render will automatically set the DATABASE_URL environment variable
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -155,7 +190,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # For production static file collection
+
+# WhiteNoise configuration for serving static files in production
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.User'
@@ -164,17 +203,35 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 
-# Payment Gateway Settings (Development)
-TELEBIRR_API_URL = 'https://api.telebirr.com'
-TELEBIRR_MERCHANT_ID = 'your_merchant_id'
-TELEBIRR_API_KEY = 'your_api_key'
+# Payment Gateway Settings (Use environment variables in production)
+TELEBIRR_API_URL = os.environ.get('TELEBIRR_API_URL', 'https://api.telebirr.com')
+TELEBIRR_MERCHANT_ID = os.environ.get('TELEBIRR_MERCHANT_ID', 'your_merchant_id')
+TELEBIRR_API_KEY = os.environ.get('TELEBIRR_API_KEY', 'your_api_key')
 
-CHAPA_API_URL = 'https://api.chapa.co/v1'
-CHAPA_SECRET_KEY = 'your_secret_key'
+CHAPA_API_URL = os.environ.get('CHAPA_API_URL', 'https://api.chapa.co/v1')
+CHAPA_SECRET_KEY = os.environ.get('CHAPA_SECRET_KEY', 'your_secret_key')
 
-CBE_API_URL = 'https://api.cbe.com.et'
-CBE_MERCHANT_CODE = 'your_merchant_code'
-CBE_API_KEY = 'your_api_key'
+CBE_API_URL = os.environ.get('CBE_API_URL', 'https://api.cbe.com.et')
+CBE_MERCHANT_CODE = os.environ.get('CBE_MERCHANT_CODE', 'your_merchant_code')
+CBE_API_KEY = os.environ.get('CBE_API_KEY', 'your_api_key')
+
+# Security Settings for Production
+if not DEBUG:
+    # HTTPS/SSL Settings
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    
+    # CORS settings (adjust based on your frontend domain)
+    CORS_ALLOWED_ORIGINS = os.environ.get(
+        'CORS_ALLOWED_ORIGINS', 
+        ''
+    ).split(',') if os.environ.get('CORS_ALLOWED_ORIGINS') else []
 
 # Default auto field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

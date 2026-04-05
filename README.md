@@ -1,509 +1,376 @@
-# CampusConnect Mini E-Commerce Platform
+# CampusConnect Mini-Ecommerce API
 
-A production-ready, scalable backend system for a campus-based multi-vendor e-commerce platform built with Django REST Framework.
+A professional e-commerce REST API built with Django and Django REST Framework for campus marketplace applications.
 
-## 🎯 Project Overview
+---
 
-CampusConnect Market enables students and local vendors within a university campus to:
+## 🚀 Quick Start
 
-- Buy and sell products
-- Manage vendor stores
-- Place and track orders
-- Make secure payments using Ethiopian payment systems (Telebirr, Chapa, CBE)
-- Review products and vendors
-- Manage wishlists and receive notifications
+### API Base URL
+```
+Production: https://your-app-name.onrender.com/api/v1
+Health Check: https://your-app-name.onrender.com/health/
+```
 
-## 🏗️ Architecture
+### Authentication
+JWT Bearer Token - Include in request headers:
+```
+Authorization: Bearer <your_access_token>
+```
 
-### Tech Stack
+---
 
-- **Backend Framework**: Django 6.0.3
-- **API Framework**: Django REST Framework 3.17.1
-- **Authentication**: JWT (Simple JWT)
-- **Database**: SQLite (Development) / PostgreSQL (Production Ready)
-- **Payment Gateways**: Telebirr, Chapa, CBE
-- **Image Handling**: Pillow
+## 📋 Core Endpoints
 
-### Design Principles
+### Authentication
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/accounts/auth/register/` | POST | Register new user |
+| `/api/v1/accounts/auth/login/` | POST | Login and get JWT tokens |
+| `/api/v1/accounts/auth/token/refresh/` | POST | Refresh access token |
+| `/api/v1/accounts/auth/profile/` | GET | Get user profile |
 
-- **SOLID Principles**: Clean, maintainable code
-- **Service Layer Architecture**: Business logic separated from views
-- **Transaction Safety**: Atomic operations for critical flows
-- **Security First**: Role-based access control, JWT authentication
-- **Performance Optimized**: Query optimization with select_related/prefetch_related
+### Products
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/products/` | GET | List all products |
+| `/api/v1/products/{id}/` | GET | Get product details |
+| `/api/v1/products/categories/` | GET | List categories |
+
+### Cart
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/cart/` | GET | Get user's cart |
+| `/api/v1/cart/items/` | POST | Add item to cart |
+| `/api/v1/cart/items/{id}/` | PATCH | Update cart item |
+| `/api/v1/cart/items/{id}/` | DELETE | Remove from cart |
+
+### Orders
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/orders/` | GET | List user's orders |
+| `/api/v1/orders/` | POST | Create new order |
+| `/api/v1/orders/{id}/` | GET | Get order details |
+
+### Additional Features
+- `/api/v1/reviews/` - Product reviews
+- `/api/v1/wishlist/` - User wishlist
+- `/api/v1/notifications/` - User notifications
+- `/api/v1/vendors/` - Vendor management
+- `/api/v1/payments/` - Payment processing
+- `/api/v1/chat/` - Messaging system
+
+📖 **Complete API Reference:** [API_DOCUMENTATION.md](./API_DOCUMENTATION.md)
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework:** Django 6.0.3
+- **API:** Django REST Framework 3.17.1
+- **Authentication:** JWT (djangorestframework-simplejwt 5.5.1)
+- **Database:** PostgreSQL (Production) / SQLite (Development)
+- **Server:** Gunicorn 21.2.0
+- **Static Files:** WhiteNoise 6.12.0
+- **CORS:** django-cors-headers 4.9.0
+
+---
+
+## 🔧 Local Development
+
+### Prerequisites
+- Python 3.11+
+- pip
+
+### Setup
+
+1. **Clone repository**
+   ```bash
+   git clone <repository-url>
+   cd Mini-Ecommerce
+   ```
+
+2. **Create virtual environment**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Run migrations**
+   ```bash
+   python manage.py migrate
+   ```
+
+5. **Create superuser**
+   ```bash
+   python manage.py createsuperuser
+   ```
+
+6. **Start server**
+   ```bash
+   python manage.py runserver
+   ```
+
+7. **Access API**
+   - API Root: http://localhost:8000/
+   - Admin: http://localhost:8000/admin/
+   - Health: http://localhost:8000/health/
+
+---
+
+## 🌐 React Integration
+
+### Install Axios
+```bash
+npm install axios
+```
+
+### Setup API Client
+```javascript
+// src/api/client.js
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'https://your-app-name.onrender.com/api/v1',
+  headers: { 'Content-Type': 'application/json' }
+});
+
+// Auto-attach JWT token
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('access_token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+export default api;
+```
+
+### Authentication Example
+```javascript
+import api from './api/client';
+
+// Register
+const register = async (userData) => {
+  const response = await api.post('/accounts/auth/register/', userData);
+  return response.data;
+};
+
+// Login
+const login = async (username, password) => {
+  const response = await api.post('/accounts/auth/login/', { username, password });
+  localStorage.setItem('access_token', response.data.access);
+  localStorage.setItem('refresh_token', response.data.refresh);
+  return response.data;
+};
+
+// Get Products
+const getProducts = async () => {
+  const response = await api.get('/products/');
+  return response.data.results;
+};
+
+// Add to Cart
+const addToCart = async (productId, quantity = 1) => {
+  const response = await api.post('/cart/items/', { 
+    product_id: productId, 
+    quantity 
+  });
+  return response.data;
+};
+```
+
+📖 **Complete React Guide:** [FRONTEND_QUICKSTART.md](./FRONTEND_QUICKSTART.md)
+
+---
+
+## 🚀 Deployment (Render.com)
+
+### Quick Deploy
+
+1. **Push to GitHub**
+   ```bash
+   git add .
+   git commit -m "Deploy CampusConnect Mini-Ecommerce"
+   git push origin main
+   ```
+
+2. **On Render Dashboard**
+   - New → Blueprint
+   - Connect GitHub repository
+   - Render auto-detects `render.yaml`
+
+3. **Set Environment Variables**
+   ```bash
+   DATABASE_URL=<auto-set-by-render>
+   SECRET_KEY=<generate-new-key>
+   DEBUG=False
+   ALLOWED_HOSTS=your-app-name.onrender.com
+   CORS_ALLOWED_ORIGINS=https://your-frontend.com
+   ```
+
+4. **Create Superuser** (via Render Shell)
+   ```bash
+   python manage.py createsuperuser
+   ```
+
+### Environment Variables
+
+**Required:**
+```bash
+DATABASE_URL=postgresql://...
+SECRET_KEY=your-secret-key
+DEBUG=False
+ALLOWED_HOSTS=your-app.onrender.com
+```
+
+**Optional (Payment Gateways):**
+```bash
+TELEBIRR_MERCHANT_ID=your_id
+TELEBIRR_API_KEY=your_key
+CHAPA_SECRET_KEY=your_key
+CBE_MERCHANT_CODE=your_code
+CBE_API_KEY=your_key
+```
+
+**Optional (CORS):**
+```bash
+CORS_ALLOWED_ORIGINS=https://frontend.com,http://localhost:3000
+```
+
+See `.env.example` for complete template.
+
+---
 
 ## 📁 Project Structure
 
 ```
 Mini-Ecommerce/
 ├── apps/
-│   ├── core/              # Base models, permissions, pagination, utilities
-│   ├── accounts/          # User authentication & management
-│   ├── vendors/           # Vendor profiles & dashboard
-│   ├── products/          # Product & category management
-│   ├── cart/              # Shopping cart functionality
-│   ├── orders/            # Order processing & management
-│   ├── payments/          # Payment gateway integration
-│   ├── reviews/           # Product & vendor reviews
-│   ├── wishlist/          # User wishlist management
-│   ├── notifications/     # Event-driven notifications
-│   └── chat/              # Messaging system
-├── MiniEcommerce/         # Project settings & configuration
-└── media/                 # User-uploaded files
+│   ├── accounts/       # User authentication & profiles
+│   ├── cart/          # Shopping cart
+│   ├── chat/          # Messaging
+│   ├── core/          # Shared utilities
+│   ├── notifications/ # Notifications
+│   ├── orders/        # Order management
+│   ├── payments/      # Payment processing
+│   ├── products/      # Product catalog
+│   ├── reviews/       # Product reviews
+│   ├── vendors/       # Vendor management
+│   └── wishlist/      # User wishlists
+├── MiniEcommerce/     # Project settings
+├── requirements.txt   # Dependencies
+├── build.sh          # Build script
+├── render.yaml       # Deployment config
+└── manage.py         # Django CLI
 ```
-
-## 🚀 Features
-
-### User Management (accounts)
-
-- User registration with role selection (customer/vendor/admin)
-- JWT-based authentication
-- Role-based permissions
-- User profile management
-
-### Vendor Management (vendors)
-
-- Vendor profile creation and management
-- Admin approval system
-- Vendor dashboard with analytics:
-  - Total products
-  - Total orders
-  - Revenue tracking
-  - Recent orders
-- Vendor rating system
-
-### Product Management (products)
-
-- CRUD operations for products
-- Category management
-- Multiple image uploads per product
-- Stock management
-- Search and filtering
-- Product ratings and reviews
-- Vendor-specific product listings
-
-### Shopping Cart (cart)
-
-- Persistent cart per user
-- Add/update/remove items
-- Stock validation
-- Real-time price calculation
-- Cart totals and item counts
-
-### Order Management (orders)
-
-- Create orders from cart
-- Order status lifecycle:
-  - pending → paid → processing → shipped → delivered
-- Price snapshot at purchase time
-- Stock reduction on order placement
-- Order history
-- Order cancellation (with stock restoration)
-
-### Payment System (payments)
-
-- **Unified Payment Service** with multiple gateways:
-  - Cash on Delivery
-  - Telebirr
-  - Chapa
-  - Commercial Bank of Ethiopia (CBE)
-- Payment initialization and verification
-- Webhook handling for payment callbacks
-- Transaction reference tracking
-- Payment status management
-- One payment per order constraint
-
-### Reviews & Ratings (reviews)
-
-- Product reviews (verified buyers only)
-- Vendor ratings
-- One review per product per user
-- Rating aggregation and statistics
-- Review verification based on purchase history
-
-### Wishlist (wishlist)
-
-- Add/remove products
-- No duplicates
-- User-specific wishlist
-- Product details in wishlist
-
-### Notifications (notifications)
-
-- Event-driven notification system
-- Notification types:
-  - Order placed
-  - Payment success/failure
-  - Vendor approval/rejection
-  - Order status updates
-- Mark as read functionality
-- Unread count tracking
-
-## 🔐 Security Features
-
-### Authentication & Authorization
-
-- JWT token-based authentication
-- Role-based access control (Customer, Vendor, Admin)
-- Permission classes:
-  - IsCustomer
-  - IsVendor
-  - IsAdmin
-  - IsOwner
-  - IsVendorOwner
-
-### Data Protection
-
-- Password hashing
-- UUID primary keys
-- Input validation
-- SQL injection prevention (ORM)
-- CSRF protection
-
-## 📊 Database Schema
-
-### Core Models
-
-- **BaseModel**: Abstract model with UUID, timestamps
-- **SoftDeleteModel**: Abstract model with soft delete support
-
-### Key Relationships
-
-```
-User (1) ─── (1) Vendor
-User (1) ─── (1) Cart
-User (1) ─── (N) Orders
-User (1) ─── (N) Wishlist
-User (1) ─── (N) Notifications
-
-Vendor (1) ─── (N) Products
-Product (1) ─── (N) ProductImages
-Product (1) ─── (N) Reviews
-Product (N) ─── (1) Category
-
-Cart (1) ─── (N) CartItems
-Order (1) ─── (N) OrderItems
-Order (1) ─── (1) Payment
-
-OrderItem (N) ─── (1) Vendor
-OrderItem (N) ─── (1) Product
-```
-
-## 🛠️ Installation & Setup
-
-### Prerequisites
-
-- Python 3.10+
-- pip
-- Virtual environment (recommended)
-
-### Installation Steps
-
-1. **Clone the repository**
-
-```bash
-git clone <repository-url>
-cd Mini-Ecommerce
-```
-
-2. **Create virtual environment**
-
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-3. **Install dependencies**
-
-```bash
-pip install -r requirements.txt
-```
-
-4. **Configure environment variables**
-   Create a `.env` file in the project root:
-
-```env
-SECRET_KEY=your-secret-key
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
-
-# Payment Gateway Credentials
-TELEBIRR_API_URL=https://api.telebirr.com
-TELEBIRR_MERCHANT_ID=your_merchant_id
-TELEBIRR_API_KEY=your_api_key
-
-CHAPA_API_URL=https://api.chapa.co/v1
-CHAPA_SECRET_KEY=your_secret_key
-
-CBE_API_URL=https://api.cbe.com.et
-CBE_MERCHANT_CODE=your_merchant_code
-CBE_API_KEY=your_api_key
-```
-
-5. **Run migrations**
-
-```bash
-python manage.py migrate
-```
-
-6. **Create superuser**
-
-```bash
-python manage.py createsuperuser
-```
-
-7. **Run development server**
-
-```bash
-python manage.py runserver
-```
-
-The API will be available at `http://localhost:8000/`
-
-## 📡 API Endpoints
-
-### Authentication
-
-```
-POST   /api/v1/accounts/auth/register/          # Register new user
-POST   /api/v1/accounts/auth/login/             # Login (get JWT tokens)
-POST   /api/v1/accounts/auth/token/refresh/     # Refresh access token
-GET    /api/v1/accounts/auth/profile/           # Get user profile
-```
-
-### Vendors
-
-```
-GET    /api/v1/vendors/                          # List approved vendors
-POST   /api/v1/vendors/                          # Create vendor profile
-GET    /api/v1/vendors/{id}/                     # Get vendor details
-PATCH  /api/v1/vendors/{id}/                     # Update vendor profile
-GET    /api/v1/vendors/my_profile/               # Get own vendor profile
-GET    /api/v1/vendors/dashboard/                # Vendor dashboard stats
-POST   /api/v1/vendors/{id}/approve/             # Approve vendor (admin)
-POST   /api/v1/vendors/{id}/reject/              # Reject vendor (admin)
-```
-
-### Products
-
-```
-GET    /api/v1/products/                         # List products
-POST   /api/v1/products/                         # Create product (vendor)
-GET    /api/v1/products/{slug}/                  # Get product details
-PATCH  /api/v1/products/{slug}/                  # Update product (owner)
-DELETE /api/v1/products/{slug}/                  # Delete product (owner)
-GET    /api/v1/products/my_products/             # Vendor's products
-POST   /api/v1/products/{slug}/toggle_active/    # Toggle product status
-```
-
-### Categories
-
-```
-GET    /api/v1/products/categories/              # List categories
-POST   /api/v1/products/categories/              # Create category (admin)
-GET    /api/v1/products/categories/{slug}/       # Get category details
-```
-
-### Cart
-
-```
-GET    /api/v1/cart/                             # Get user's cart
-POST   /api/v1/cart/add_item/                    # Add item to cart
-PATCH  /api/v1/cart/update-item/{id}/            # Update cart item
-DELETE /api/v1/cart/remove-item/{id}/            # Remove cart item
-DELETE /api/v1/cart/clear/                       # Clear cart
-```
-
-### Orders
-
-```
-GET    /api/v1/orders/                           # List user's orders
-GET    /api/v1/orders/{id}/                      # Get order details
-POST   /api/v1/orders/checkout/                  # Create order from cart
-POST   /api/v1/orders/{id}/cancel/               # Cancel order
-```
-
-### Payments
-
-```
-GET    /api/v1/payments/                         # List user's payments
-GET    /api/v1/payments/{id}/                    # Get payment details
-POST   /api/v1/payments/initialize/              # Initialize payment
-POST   /api/v1/payments/{id}/verify/             # Verify payment
-POST   /api/v1/payments/webhook/{method}/        # Payment webhook
-```
-
-### Reviews
-
-```
-GET    /api/v1/reviews/products/                 # List product reviews
-POST   /api/v1/reviews/products/                 # Create product review
-GET    /api/v1/reviews/products/{id}/            # Get review details
-GET    /api/v1/reviews/products/my_reviews/      # User's reviews
-GET    /api/v1/reviews/products/product/{id}/stats/  # Product review stats
-```
-
-### Wishlist
-
-```
-GET    /api/v1/wishlist/                         # Get user's wishlist
-POST   /api/v1/wishlist/                         # Add to wishlist
-DELETE /api/v1/wishlist/{id}/                    # Remove from wishlist
-DELETE /api/v1/wishlist/clear/                   # Clear wishlist
-```
-
-### Notifications
-
-```
-GET    /api/v1/notifications/                    # List notifications
-GET    /api/v1/notifications/{id}/               # Get notification
-POST   /api/v1/notifications/{id}/mark_as_read/  # Mark as read
-POST   /api/v1/notifications/mark_all_as_read/   # Mark all as read
-GET    /api/v1/notifications/unread_count/       # Get unread count
-```
-
-## 🔄 Payment Flow
-
-### 1. Checkout Process
-
-```
-User adds items to cart
-  ↓
-User initiates checkout
-  ↓
-System creates order (status: pending)
-  ↓
-System creates payment record
-  ↓
-System initializes payment with gateway
-  ↓
-User redirected to payment gateway (if online)
-  ↓
-User completes payment
-  ↓
-Gateway sends webhook callback
-  ↓
-System verifies payment
-  ↓
-Order status updated to 'paid'
-  ↓
-Notification sent to user
-```
-
-### 2. Payment Methods
-
-#### Cash on Delivery
-
-- No gateway initialization required
-- Payment marked as pending
-- Completed upon delivery
-
-#### Online Payments (Telebirr, Chapa, CBE)
-
-- Gateway initialization
-- Redirect to payment page
-- Webhook verification
-- Automatic status update
-
-## 🧪 Testing
-
-### Run Tests
-
-```bash
-python manage.py test
-```
-
-### Test Coverage
-
-- Model validation
-- API endpoints
-- Permission checks
-- Payment flow
-- Order creation
-- Stock management
-
-## 📈 Performance Optimization
-
-### Database Optimization
-
-- Indexed fields for faster queries
-- `select_related()` for foreign keys
-- `prefetch_related()` for reverse relations
-- Query result caching
-
-### API Optimization
-
-- Pagination on all list endpoints
-- Filtering and search capabilities
-- Lightweight serializers for list views
-- Detailed serializers for detail views
-
-## 🔧 Configuration
-
-### Settings
-
-Key settings in `MiniEcommerce/settings.py`:
-
-- `AUTH_USER_MODEL`: Custom user model
-- `REST_FRAMEWORK`: DRF configuration
-- `SIMPLE_JWT`: JWT settings
-- Payment gateway credentials
-
-### Media Files
-
-- Product images: `media/products/`
-- Vendor logos: `media/vendors/logos/`
-- Category images: `media/categories/`
-
-## 🚦 Status Codes
-
-- `200 OK`: Successful GET, PATCH, PUT
-- `201 Created`: Successful POST
-- `204 No Content`: Successful DELETE
-- `400 Bad Request`: Validation error
-- `401 Unauthorized`: Authentication required
-- `403 Forbidden`: Permission denied
-- `404 Not Found`: Resource not found
-- `500 Internal Server Error`: Server error
-
-## 👥 User Roles
-
-### Customer
-
-- Browse products
-- Manage cart
-- Place orders
-- Make payments
-- Write reviews
-- Manage wishlist
-
-### Vendor
-
-- Create vendor profile
-- Manage products
-- View orders
-- Access dashboard
-- View analytics
-
-### Admin
-
-- Full system access
-- Approve/reject vendors
-- Manage all resources
-- View all orders and payments
-
-## 📝 License
-
-This project is part of a capstone project for AASTU.
-
-## 🤝 Contributing
-
-This is a capstone project. For any issues or suggestions, please contact the development team.
-
-## 📞 Support
-
-For support and queries, please refer to the project documentation or contact the development team.
 
 ---
 
-**Built with ❤️ for AASTU Campus Community**
+## 🔐 Security Features
+
+- ✅ JWT authentication with token refresh
+- ✅ HTTPS enforced in production
+- ✅ Secure cookies (session & CSRF)
+- ✅ CORS protection
+- ✅ SQL injection protection (Django ORM)
+- ✅ XSS protection
+- ✅ Environment-based secrets
+- ✅ HSTS headers
+
+---
+
+## 📊 API Features
+
+- ✅ RESTful design
+- ✅ JWT authentication
+- ✅ Pagination (10 items per page)
+- ✅ Filtering & search
+- ✅ Ordering/sorting
+- ✅ CORS enabled
+- ✅ Comprehensive error handling
+- ✅ Health check endpoint
+
+---
+
+## 🧪 Testing
+
+### Health Check
+```bash
+curl https://your-app-name.onrender.com/health/
+```
+
+### Register User
+```bash
+curl -X POST https://your-app-name.onrender.com/api/v1/accounts/auth/register/ \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser","email":"test@example.com","password":"testpass123"}'
+```
+
+### Login
+```bash
+curl -X POST https://your-app-name.onrender.com/api/v1/accounts/auth/login/ \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser","password":"testpass123"}'
+```
+
+### Get Products
+```bash
+curl https://your-app-name.onrender.com/api/v1/products/
+```
+
+---
+
+## 📚 Documentation
+
+- **[API_DOCUMENTATION.md](./API_DOCUMENTATION.md)** - Complete API reference with examples
+- **[FRONTEND_QUICKSTART.md](./FRONTEND_QUICKSTART.md)** - React integration guide
+- **[.env.example](./.env.example)** - Environment variables template
+
+---
+
+## 🐛 Troubleshooting
+
+### CORS Errors
+Add your frontend domain to `CORS_ALLOWED_ORIGINS` environment variable.
+
+### Authentication Errors
+- Verify token is included in Authorization header
+- Check token hasn't expired (60 minutes)
+- Use refresh token to get new access token
+
+### 404 Errors
+- Verify endpoint URL includes `/api/v1/` prefix
+- Check trailing slashes in URLs
+
+---
+
+## 📞 Support
+
+- **Health Check:** `GET /health/`
+- **API Root:** `GET /` (lists all endpoints)
+- **Admin Panel:** `/admin/`
+
+---
+
+## 📝 License
+
+MIT License
+
+---
+
+## 👥 Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/NewFeature`)
+3. Commit changes (`git commit -m 'Add NewFeature'`)
+4. Push to branch (`git push origin feature/NewFeature`)
+5. Open Pull Request
+
+---
+
+**CampusConnect Mini-Ecommerce** - Professional E-commerce API for Campus Marketplaces
